@@ -1,5 +1,5 @@
 {
-    "DATABASE_URL": "mongodb+srv://admin:admin@123@cluster0-tsiqn.mongodb.net/test?retryWrites=true&w=majority",
+    "DATABASE_URL": "mongodb+srv://shantanuSimpleGame:shantanu@237@cluster0.yk1vf.mongodb.net/test",
     "REDIS_URL": "localhost",
     "REDIS_PORT": 6379
   }
