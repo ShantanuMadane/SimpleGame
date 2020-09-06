@@ -109,19 +109,6 @@ socket.on('connectToRoom',function(data) {
      console.log("game will start in 3 seconds",data)
   });
 
-  socket.on('turnStart',function(data) {
-    console.log("Turn for player 1",data.playerTurnId)
-  });
-  socket2.on('turnStart',function(data) {
-    console.log("Turn for player 1",data.playerTurnId)
-  });
-  socket3.on('turnStart',function(data) {
-    console.log("Turn for player 1",data.playerTurnId) 
-  });
-  socket4.on('turnStart',function(data) {
-    console.log("Turn for player 1",data.playerTurnId)
-  });
-
 
 socket.on("disconnect",()=>{
     console.log("client1 to lobby disconnection successful")
@@ -134,4 +121,21 @@ socket3.on("disconnect",()=>{
 })
 socket4.on("disconnect",()=>{
     console.log("client4 to lobby disconnection successful")
+})
+
+socket.on("turnStart",(data)=>{
+    console.log("turn starts for playerId",data.nextTurnId)
+    console.log("You have 27 seconds to roll dice");
+})
+socket2.on("turnStart",(data)=>{
+    console.log("turn starts for playerId",data.nextTurnId)
+    console.log("You have 27 seconds to roll dice");
+})
+socket3.on("turnStart",(data)=>{
+    console.log("turn starts for playerId",data.nextTurnId)
+    console.log("You have 27 seconds to roll dice");
+})
+socket4.on("turnStart",(data)=>{
+    console.log("turn starts for playerId",data.nextTurnId)
+    console.log("You have 27 seconds to roll dice");
 })
