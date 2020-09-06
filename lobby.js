@@ -37,13 +37,11 @@ function socketLobbyListeners(socket) {
     }
     socket.join("room-" + roomno);
     //Send this event to everyone in the room.
-    io.sockets
-      .in("room-" + roomno)
-      .emit("connectToRoom", "You are in room no. " + roomno);
+    io.sockets.in("room-" + roomno).emit("connectToRoom", "You are in room no. " + roomno);
     LobbyMessageHandler.login(socket, data, cb);
   });
-  socket.on("findMatch",(data,cb)=>{
-    LobbyMessageHandler.findMatch(socket, data, cb);
+  socket.on("findAndJoinMatch",(data,cb)=>{
+    LobbyMessageHandler.findAndJoinMatch(socket, data, cb);
   });
 }
 

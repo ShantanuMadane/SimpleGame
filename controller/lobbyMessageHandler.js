@@ -2,6 +2,7 @@ const shortid = require("shortid");
 const ConfigModule = require("../utils/config.js");
 const UserSocketHandler = require("./userSocketHandler");
 const { ERROR } = require("./constants.js");
+const NanoTimer = require('nanotimer');
 
 class LobbyMessageHandler {
     static instance = null;
@@ -71,6 +72,11 @@ class LobbyMessageHandler {
             );
         } catch (err) {
             console.error(err.stack);
+            callback({
+                status: ERROR.UNKNOWN,
+                data: {},
+                message: "Unknown error."
+            });
         }
     }
     login(socket, socketData, callback) {
@@ -99,6 +105,8 @@ class LobbyMessageHandler {
                         if (!err) {
                             console.log("NEW DATA SAVED SUCCESSFULLY")
                             this.userSockets.addPlayerData(newPlayerData);
+                            console.log("SETTING USER SOCKET",newPlayerData.id)
+                            this.userSockets.setUserSocket(newPlayerData.id,socket)
                             callback({ status: ERROR.OK, message: "Login successful" });
                         } else {
                             callback({
@@ -128,6 +136,8 @@ class LobbyMessageHandler {
                                     wins: 0
                                 };
                                 this.userSockets.addPlayerData(newPlayerData);
+                                console.log("SETTING USER SOCKET",newPlayerData.id)
+                                this.userSockets.setUserSocket(newPlayerData.id,socket)
                                 callback({ status: ERROR.OK, message: "Login successful" });
                             }
                         }
@@ -139,9 +149,71 @@ class LobbyMessageHandler {
             callback({ status: ERROR.UNKNOWN, data: {}, message: "Server error." });
         }
     }
-    findMatch(socket,socketData,callback){
-        
+    findAndJoinMatch(socket,socketData,callback){
+        try{
+            console.log("FIND AND JOIN MATCH")
+          const playerId = socketData.id;
+          const playerData = this.userSockets.getPlayerData(playerId);
+          const roomData = this.userSockets.getRoomData("room-1");
+          const playerGameData = {
+              id:playerData.id,
+              score:0,
+              gold:playerData.gold,
+              diamonds:playerData.diamonds,
+              roundCount:0,
+          };
+          this.userSockets.joinRoom("room-1",playerGameData);
+
+          const roomPlayers = Object.keys(roomData["playerData"]);
+          console.log("ROOM PLAYER ID's",roomPlayers)
+          if(roomPlayers.length > 3){
+             const playerTurnId = this.getNextPlayerTurn("room-1");
+             console.log("playerTurnId======>",playerTurnId)
+             for(var i=0;i<roomPlayers.length;i++){
+                var playerSocket = this.userSockets.getUserSocket(roomPlayers[i]);
+                const timer =  new NanoTimer();
+                setTimeout(()=>{
+                    playerSocket.emit("gameStart",{playerTurnId});
+                    const currentPlayerSocket = this.userSockets.getUserSocket(playerTurnId)
+                    currentPlayerSocket.emit("turnStart",{playerTurnId})           
+                   // this.userSockets.roomData["room-1"]["roundStartTimer"]=roundStartTimer;
+                 }, 3000);
+               //  timer.setTimeout(diceRoll, [playerTurnId], '27s');
+             }
+          }
+          callback({status:ERROR.OK,message:"finding and joining match successful"});
+        }catch(err){
+            console.log("error in findMatch",err);
+
+        }
     }
+    getNextPlayerTurn(roomId){
+        try{
+            const roomData = this.userSockets.getRoomData(roomId);
+            const playerIds = Object.keys(roomData["playerData"]);
+            console.log("INSIDE getNextPlayerTurn",playerIds)
+            var selectedPlayerId = playerIds[0];
+            var  findMinRoundCount = playerIds[0].roundCount;
+            for(var i=0;i<playerIds.length;i++){
+                if(roomData["playerData"][playerIds[i]].roundCount == 0){
+                    console.log("selectedPlayerId====>",selectedPlayerId)
+                    return selectedPlayerId;
+                }else{
+                    if(findMinRoundCount < roomData[playerIds[i]].roundCount){
+                      findMinRoundCount = roomData[playerIds[i]].roundCount;
+                      selectedPlayerId = playerIds[i];
+                   
+                    }
+                }
+            }
+            console.log("selectedPlayerId2====>",selectedPlayerId)
+            return selectedPlayerId
+
+        }catch(err){
+            console.error("error in getNextPlayerTurn",err)
+        }
+    }
+
 }
 
 module.exports = LobbyMessageHandler;

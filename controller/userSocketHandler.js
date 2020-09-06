@@ -6,8 +6,9 @@ class UserSocketHandler {
         this.players = {};
         this.playerData={};
         this.roomData={
+            
             "room-1":{
-                
+                "playerData":{}
             }
         };
         UserSocketHandler.instance = this;
@@ -20,6 +21,7 @@ class UserSocketHandler {
       if (Object.keys(this.userSockets).indexOf(userId) !== -1) {
         return this.userSockets[userId];
       }
+      console.error("SOCKET NOT FOUND",userId)
       return null;
     }
   
@@ -31,6 +33,7 @@ class UserSocketHandler {
     }
   
     setUserSocket(userId, socket) {
+        console.log("TOTAL SOCKET LENGTH",Object.keys(this.userSockets).length)
       if (userId !== undefined && userId != null && userId !== "undefined" && userId !== "null") {
         this.userSockets[userId] = socket;
         this.setPlayerId(userId, socket.id);
@@ -62,7 +65,18 @@ class UserSocketHandler {
     getPlayerData(playerId){
         return  this.playerData[playerId]
     }
-    joinRoom(roomId,)
+    joinRoom(roomId,playerData){
+        this.roomData[roomId]["playerData"][playerData.id]=playerData;
+    }
+    clearRoomData(roomId){
+        this.roomData["room-1"]["playerData"]={}
+    }
+    removePlayerfromRoom(roomId,playerId){
+       delete this.roomData["room-1"]["playerData"][playerData.id]
+    }
+    getRoomData(roomId){
+        return this.roomData[roomId]
+    }
   }
   
   // const instance = new UserSocketHandler();

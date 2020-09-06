@@ -12,46 +12,72 @@ socket.on("connect",()=>{
         console.log(data);
         if(data.status == ERROR.OK){
             console.log("new player added to the map")
+            socket.emit("findAndJoinMatch",{id:"emfJjWW1gv"},(data)=>{
+                if(data.status == ERROR.OK){
+                    console.log("finding and joining room")  
+                }
+            });
+            
         }
     });
 })
 socket2.on("connect",()=>{
     console.log("client2 to lobby connection successful")
-    socket.emit("login",{accountType:"guest",guestToken:"38LACjsxW5"},(data)=>{
+    socket2.emit("login",{accountType:"guest",guestToken:"38LACjsxW5"},(data)=>{
         console.log(data);
         if(data.status == ERROR.OK){
             console.log("new player added to the map")
+            socket2.emit("findAndJoinMatch",{id:"38LACjsxW5"},(data)=>{
+                if(data.status == ERROR.OK){
+                    console.log("finding and joining room")  
+                }
+            });
         }
     });
 })
 socket3.on("connect",()=>{
     console.log("client3 to lobby connection successful")
-    socket.emit("login",{accountType:"guest",guestToken:"K5g4K7ZRb9"},(data)=>{
+    socket3.emit("login",{accountType:"guest",guestToken:"K5g4K7ZRb9"},(data)=>{
         console.log(data);
         if(data.status == ERROR.OK){
             console.log("new player added to the map")
+            socket3.emit("findAndJoinMatch",{id:"K5g4K7ZRb9"},(data)=>{
+                if(data.status == ERROR.OK){
+                    console.log("finding and joining room")  
+                }
+            });
         }
     });
 })
 socket4.on("connect",()=>{
     console.log("client4 to lobby connection successful")
-    socket.emit("login",{accountType:"guest",guestToken:"QRsILEiQf"},(data)=>{
+    socket4.emit("login",{accountType:"guest",guestToken:"QRsILEiQf"},(data)=>{
         console.log(data);
         if(data.status == ERROR.OK){
             console.log("new player added to the map")
+            socket4.emit("findAndJoinMatch",{id:"QRsILEiQf"},(data)=>{
+                if(data.status == ERROR.OK){
+                    console.log("finding and joining room")  
+                }
+            });
+            
         }
     });
 })
-socket5.on("connect",()=>{
-    console.log("client4 to lobby connection successful")
-    socket.emit("login",{accountType:"guest",guestToken:"ABCTBBS"},(data)=>{
-        console.log(data);
-        if(data.status == ERROR.OK){
-            console.log("new player added to the map")
-        }
-    });
-})
-
+// socket5.on("connect",()=>{
+//     console.log("client4 to lobby connection successful")
+//     socket5.emit("login",{accountType:"guest",guestToken:"ABCTBBS"},(data)=>{
+//         console.log(data);
+//         if(data.status == ERROR.OK){
+//             console.log("new player added to the map")
+//             socket5.emit("findAndJoinMatch",{id:"ABCTBBS"},(data)=>{
+//                 if(data.status == ERROR.OK){
+//                     console.log("finding and joining room")  
+//                 }
+//             });
+//         }
+//     });
+// })
 
 socket.on('connectToRoom',function(data) {
    console.log("connectToRoom",data)
@@ -68,6 +94,33 @@ socket.on('connectToRoom',function(data) {
     console.log("connectToRoom",data)
   
  });
+
+ socket.on('gameStart',function(data) {
+    console.log("game will start in 3 seconds",data)
+  });
+  socket2.on('gameStart',function(data) {
+     console.log("game will start in 3 seconds",data)
+     
+  });
+  socket3.on('gameStart',function(data) {
+     console.log("game will start in 3 seconds",data)   
+  });
+  socket4.on('gameStart',function(data) {
+     console.log("game will start in 3 seconds",data)
+  });
+
+  socket.on('turnStart',function(data) {
+    console.log("Turn for player 1",data.playerTurnId)
+  });
+  socket2.on('turnStart',function(data) {
+    console.log("Turn for player 1",data.playerTurnId)
+  });
+  socket3.on('turnStart',function(data) {
+    console.log("Turn for player 1",data.playerTurnId) 
+  });
+  socket4.on('turnStart',function(data) {
+    console.log("Turn for player 1",data.playerTurnId)
+  });
 
 
 socket.on("disconnect",()=>{
