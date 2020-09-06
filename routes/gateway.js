@@ -6,6 +6,7 @@ const router = express.Router();
 
 function balanceLoad() {
   const balance = gatewayModel.getBalance();
+  console.log("BALANCE====>",balance);
   const url = gatewayModel.getUrl();
   const keys = Object.keys(balance);
 
@@ -23,39 +24,35 @@ function balanceLoad() {
 router.get("/", (req, res) => {
   res.setHeader("Connection", "close");
   let playerId = req.query.id;
-  const fbId = req.query.fb_id;
-  if (fbId) {
-    playerId = fbId;
-  }
   if (playerId) {
     Config.RedisClient.get(playerId.concat("_", "LOBBYIP"), (err, reply) => {
       if (err) {
-        const url = balanceLoad(res);
+        const url = balanceLoad();
         console.log(
           `[Error occured] normal logic used for Load balancing, url: ${url}`
         );
-        res.end(`${url}_${Config.getConfig().CHAT_SERVER_IP}`);
+        res.end(`${url}`);
         return;
       }
       if (!reply) {
-        const url = balanceLoad(res);
+        const url = balanceLoad();
         console.log(
           `No player in redis, normal logic used for Load balancing, url: ${url}`
         );
-        res.end(`${url}_${Config.getConfig().CHAT_SERVER_IP}`);
+        res.end(`${url}`);
         return;
       }
       console.log(
         `Player found in redis, connected already to server: ${reply}`
       );
-      res.end(`${reply}_${Config.getConfig().CHAT_SERVER_IP}`);
+      res.end(`${reply}`);
     });
   } else {
-    const url = balanceLoad(res);
+    const url = balanceLoad();
     console.log(
       `No player provided, normal logic used for Load balancing, url: ${url}`
     );
-    res.end(`${url}_${Config.getConfig().CHAT_SERVER_IP}`);
+    res.end(`${url}`);
   }
 });
 

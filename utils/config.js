@@ -43,7 +43,8 @@ class Config {
           console.log("INSIDE ELSE 1");
           this.MongoClient.connect(nconf.get('DATABASE_URL'), { useUnifiedTopology: true }, (err, client) => {
             if (err) {
-              callback(err);
+              console.log("Error in mongo connection",err)
+              done(err);
             } else {
               console.log('Database Connected.');
               this.db = client.db('simplegame');

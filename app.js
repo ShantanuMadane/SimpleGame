@@ -10,6 +10,7 @@ var usersRouter = require('./routes/users');
 const Config = require("./utils/config").getInstance();
 const gatewayRouter = require("./routes/gateway");
 const balanceRouter = require("./routes/balance");
+const GatewayMessageHandler = require("./controller/gatewayMessageHandler");
 
 var app = express();
 const server = require("http").createServer(app);
@@ -80,7 +81,6 @@ process.on("uncaughtException", (err) => {
   safeExit("uncaughtException");
 });
 
-app.listen(process.env.PORT_NUMBER, () => {
-  console.log(`SimpleGame app listening at http://localhost:${process.env.PORT_NUMBER}`)
-})
+server.listen(process.env.PORT_NUMBER, () => console.log(`Example app listening on port ${process.env.PORT_NUMBER}!`));
 module.exports = app;
+
