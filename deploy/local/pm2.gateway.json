@@ -1,0 +1,23 @@
+{
+    "apps": [
+      {
+        "name": "GATEWAY_SERVER",
+        "script": "app.js",
+        "watch": true,
+        "ignore_watch": [
+          "*.log",
+          ".git",
+          "*.csv",
+          "*.json",
+          "LOG",
+          "test"
+        ],
+        "env": {
+          "ENVIRONMENT": "local",
+          "PORT_NUMBER": 5000,
+          "SERVER_NAME": "GATEWAY1"
+        },
+        "cwd": "../../"
+      }
+    ]
+  }

@@ -1,0 +1,47 @@
+{
+    "apps": [
+      {
+        "name": "LOBBY_SERVER_1",
+        "script": "lobby.js",
+        "watch": true,
+        "ignore_watch": ["*.log", ".git", "*.csv", "*.json", "LOG"],
+        "env": {
+          "ENVIRONMENT": "local",
+          "PORT_NUMBER": 3000,
+          "SERVER_NAME": "LOBBY1",
+          "GATEWAY_IP": "http://localhost:5000",
+          "SERVER_URL": "http://localhost:3000"
+        },
+        "cwd": "../../"
+      },
+      {
+        "name": "LOBBY_SERVER_2",
+        "script": "lobby.js",
+        "watch": true,
+        "ignore_watch": ["*.log", ".git", "*.csv", "*.json", "LOG"],
+        "env": {
+          "ENVIRONMENT": "local",
+          "PORT_NUMBER": 3001,
+          "SERVER_NAME": "LOBBY2",
+          "GATEWAY_IP": "http://localhost:5000",
+          "SERVER_URL": "http://localhost:3001"
+        },
+        "cwd": "../../"
+      },
+      {
+        "name": "LOBBY_SERVER_3",
+        "script": "lobby.js",
+        "watch": true,
+        "ignore_watch": ["*.log", ".git", "*.csv", "*.json", "LOG"],
+        "env": {
+          "ENVIRONMENT": "local",
+          "PORT_NUMBER": 3002,
+          "SERVER_NAME": "LOBBY3",
+          "GATEWAY_IP": "http://localhost:5000",
+          "SERVER_URL": "http://localhost:3002"
+        },
+        "cwd": "../../"
+      }
+    ]
+  }
+  

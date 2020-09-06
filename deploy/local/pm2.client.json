@@ -1,0 +1,15 @@
+{
+    "apps": [
+      {
+        "name": "CLIENT_SERVER",
+        "script": "../../client.js",
+        "watch": true,
+        "ignore_watch": ["*.log", ".git", "*.csv", "*.json"],
+        "env": {
+          "ENVIRONMENT": "local",
+          "PORT_NUMBER": 4000
+        }
+      }
+    ]
+  }
+  
