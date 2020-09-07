@@ -182,7 +182,8 @@ class LobbyMessageHandler {
             if (playerTurnId == roomPlayers[i]) {
               console.log("EMITTING TURN START", playerTurnId);
               currentPlayerSocket.emit("turnStart", {
-                nextTurnId: playerTurnId
+                nextTurnId: playerTurnId,
+                roomId: "room-1"
               });
             }
             this.userSockets.roomData["room-1"]["roundStartTimer"] = timer;
@@ -202,34 +203,61 @@ class LobbyMessageHandler {
       console.log("error in findMatch", err);
     }
   }
-    getNextPlayerTurn(roomId) {
-        try {
-            const roomData = this.userSockets.getRoomData(roomId);
-            const playerIds = Object.keys(roomData["playerData"]);
-            console.log("INSIDE getNextPlayerTurn", playerIds);
-            var selectedPlayerId = playerIds[0];
-            var findMinRoundCount = roomData["playerData"][playerIds[0]].roundCount;
-            for (var i = 0; i < playerIds.length; i++) {
-             //   console.log("getNextPlayerTurn ", roomData["playerData"][playerIds[i]]);
+  getNextPlayerTurn(roomId) {
+    try {
+      const roomData = this.userSockets.getRoomData(roomId);
+      const playerIds = Object.keys(roomData["playerData"]);
+      console.log("INSIDE getNextPlayerTurn", playerIds);
+      var selectedPlayerId = playerIds[0];
+      var findMinRoundCount =
+        roomData["playerData"][selectedPlayerId].roundCount;
+      for (var i = 0; i < playerIds.length; i++) {
+        //   console.log("getNextPlayerTurn ", roomData["playerData"][playerIds[i]]);
 
-                console.log(
-                    "findMinRoundCount",
-                    findMinRoundCount,
-                    roomData["playerData"][playerIds[i]].roundCount
-                );
-                if (
-                    findMinRoundCount > roomData["playerData"][playerIds[i]].roundCount
-                ) {
-                    findMinRoundCount = roomData["playerData"][playerIds[i]].roundCount;
-                    selectedPlayerId = playerIds[i];
-                }
-            }
-            console.log("selectedPlayerId2====>", selectedPlayerId);
-            return selectedPlayerId;
-        } catch (err) {
-            console.error("error in getNextPlayerTurn", err);
+        console.log(
+          "findMinRoundCount",
+          findMinRoundCount,
+          roomData["playerData"][playerIds[i]].roundCount
+        );
+        if (
+          findMinRoundCount > roomData["playerData"][playerIds[i]].roundCount
+        ) {
+          findMinRoundCount = roomData["playerData"][playerIds[i]].roundCount;
+          selectedPlayerId = playerIds[i];
         }
+      }
+      console.log("selectedPlayerId2====>", selectedPlayerId);
+      return selectedPlayerId;
+    } catch (err) {
+      console.error("error in getNextPlayerTurn", err);
     }
+  }
+  playerDiceRoll(socket, socketData, callback) {
+    try {
+      this.diceRoll(socketData.id, socketData.roomId, data => {
+        if (data.status == ERROR.OK) {
+          callback({ status: ERROR.OK });
+        }
+      }).bind(this);
+    } catch (err) {
+      console.error("ERROR in playerDiceRoll");
+    }
+  }
+  // calculateScore(playerData){
+  //   try{
+  //     if(playerData.score >= 61){
+  //       console.log("PLAYER ID IS WINNER",playerData.id)
+  //       const roomData = this.userSockets.getRoomData("room-1");
+  //       const roomPlayers = Object.keys(roomData["playerData"]);
+  //       this.userSockets[playerData.id].emit("declareWinner",{playerId:playerData.id})
+  //       for(var i =0 ;i< roomPlayers.length;i++){
+  //         this.userSockets[roomPlayers[i]].emit("disconnect");
+  //       }
+  //     }
+  //   }catch(err){
+  //     console.error("error in calculateScore",err);
+  //   }
+  // }
   diceRoll(playerTurnId, roomId, callback) {
     try {
       console.log("DICE ROLL CALLED");
@@ -241,33 +269,53 @@ class LobbyMessageHandler {
       // random Dice Roll
       const randomNumber = parseInt(Math.random() * 100 + 1, 10);
       let diceOutcome = 0;
+      console.log("randomNumber", randomNumber);
       if (playerData.maxRewardPercent < 30) {
         diceOutcome = this.randomRoll(randomNumber);
+        console.log("DICE OUTCOME", diceOutcome);
       } else {
         diceOutcome = this.riggedRoll(playerData, randomNumber);
+        console.log("DICE OUTCOME2", diceOutcome);
       }
       const roomPlayers = Object.keys(roomData["playerData"]);
       console.log("ROUND COUNT BEFORE", playerData.roundCount, playerData.id);
       playerData.roundCount += 1;
       console.log("ROUND COUNT AFTER", playerData.roundCount);
       playerData.score += diceOutcome;
-      const getNextPlayerTurn = this.getNextPlayerTurn(roomId);
-      for (var i = 0; i < roomPlayers.length; i++) {
-        this.userSockets
-          .getUserSocket(roomPlayers[i])
-          .emit("diceOutcome", { diceOutcome, playerId: playerTurnId });
-        if (getNextPlayerTurn == roomPlayers[i]) {
-          this.userSockets
-            .getUserSocket(roomPlayers[i])
-            .emit("turnStart", { nextTurnId: getNextPlayerTurn });
-          roomData["roundStartTimer"] = timer;
-          timer.setTimeout(
-            this.diceRoll.bind(this),
-            [getNextPlayerTurn, "room-1"],
-            "27s"
-          );
+      // CALCULATE SCORE
+      if (playerData.score >= 61) {
+        console.log("PLAYER ID IS WINNER", playerData.id);
+        const roomData = this.userSockets.getRoomData("room-1");
+        const roomPlayers = Object.keys(roomData["playerData"]);
+        this.userSockets.getUserSocket(playerData.id).emit("declareWinner", {
+          playerId: playerData.id
+        });
+        for (var i = 0; i < roomPlayers.length; i++) {
+          this.userSockets.getUserSocket(roomPlayers[i]).emit("disconnect");
+        }
+      } else {
+        const getNextPlayerTurnId = this.getNextPlayerTurn(roomId);
+        for (var i = 0; i < roomPlayers.length; i++) {
+          this.userSockets.getUserSocket(roomPlayers[i]).emit("diceOutcome", {
+            diceOutcome,
+            playerId: playerTurnId,
+            totalScore: playerData.score
+          });
+          if (getNextPlayerTurnId == roomPlayers[i]) {
+            this.userSockets.getUserSocket(roomPlayers[i]).emit("turnStart", {
+              nextTurnId: getNextPlayerTurnId,
+              roomId: "room-1"
+            });
+            roomData["roundStartTimer"] = timer;
+            timer.setTimeout(
+              this.diceRoll.bind(this),
+              [getNextPlayerTurnId, "room-1"],
+              "27s"
+            );
+          }
         }
       }
+      if (callback) callback({ status: ERROR.OK });
     } catch (err) {
       console.error("error in diceRoll", err);
     }
@@ -281,22 +329,22 @@ class LobbyMessageHandler {
       dice5: 5,
       dice6: 6
     };
-    if (1 <= randomNumber <= 15) {
+    if (1 <= randomNumber && randomNumber <= 15) {
       return outcome.dice1;
     }
-    if (16 <= randomNumber <= 30) {
+    if (16 <= randomNumber && randomNumber <= 30) {
       return outcome.dice2;
     }
-    if (31 <= randomNumber <= 55) {
+    if (31 <= randomNumber && randomNumber <= 55) {
       return outcome.dice3;
     }
-    if (56 <= randomNumber <= 80) {
+    if (56 <= randomNumber && randomNumber <= 80) {
       return outcome.dice4;
     }
-    if (81 <= randomNumber <= 90) {
+    if (81 <= randomNumber && randomNumber <= 90) {
       return outcome.dice5;
     }
-    if (91 <= randomNumber <= 100) {
+    if (91 <= randomNumber && randomNumber <= 100) {
       return outcome.dice6;
     }
   }
@@ -315,22 +363,22 @@ class LobbyMessageHandler {
       return outcome.dice6;
     } else {
       playerData.maxRewardPercent += 10;
-      if (1 <= randomNumber <= 15) {
+      if (1 <= randomNumber && randomNumber <= 15) {
         return outcome.dice1;
       }
-      if (16 <= randomNumber <= 30) {
+      if (16 <= randomNumber && randomNumber <= 30) {
         return outcome.dice2;
       }
-      if (31 <= randomNumber <= 55) {
+      if (31 <= randomNumber && randomNumber <= 55) {
         return outcome.dice3;
       }
-      if (56 <= randomNumber <= 80) {
+      if (56 <= randomNumber && randomNumber <= 80) {
         return outcome.dice4;
       }
-      if (81 <= randomNumber <= 90) {
+      if (81 <= randomNumber && randomNumber <= 90) {
         return outcome.dice5;
       }
-      if (91 <= randomNumber <= 100) {
+      if (91 <= randomNumber && randomNumber <= 100) {
         return outcome.dice6;
       }
     }

@@ -126,16 +126,50 @@ socket4.on("disconnect",()=>{
 socket.on("turnStart",(data)=>{
     console.log("turn starts for playerId",data.nextTurnId)
     console.log("You have 27 seconds to roll dice");
-})
+   //  socket.emit("playerDiceRoll",{id:"emfJjWW1gv",roomId:data.roomId})
+});
 socket2.on("turnStart",(data)=>{
     console.log("turn starts for playerId",data.nextTurnId)
     console.log("You have 27 seconds to roll dice");
-})
+   // socket2.emit("playerDiceRoll",{id:"38LACjsxW5",roomId:data.roomId})
+});
 socket3.on("turnStart",(data)=>{
     console.log("turn starts for playerId",data.nextTurnId)
     console.log("You have 27 seconds to roll dice");
-})
+    // socket3.emit("playerDiceRoll",{id:"K5g4K7ZRb9",roomId:data.roomId})
+});
 socket4.on("turnStart",(data)=>{
     console.log("turn starts for playerId",data.nextTurnId)
     console.log("You have 27 seconds to roll dice");
-})
+    // socket4.emit("playerDiceRoll",{id:"QRsILEiQf",roomId:data.roomId})
+});
+
+socket.on("diceOutcome",(data)=>{
+    console.log("dice outcome for playerId",data.playerId,data.diceOutcome)
+    console.log("total score",data.totalScore)
+});
+socket2.on("diceOutcome",(data)=>{
+    console.log("dice outcome for playerId",data.playerId,data.diceOutcome)
+    console.log("total score",data.totalScore)
+});
+socket3.on("diceOutcome",(data)=>{
+    console.log("dice outcome for playerId",data.playerId,data.diceOutcome)
+    console.log("total score",data.totalScore)
+});
+socket4.on("diceOutcome",(data)=>{
+    console.log("dice outcome for playerId",data.playerId,data.diceOutcome)
+    console.log("total score",data.totalScore)
+});
+
+socket.on("declareWinner",(data)=>{
+    console.log("Winner for the game is",data.playerId)
+});
+socket2.on("declareWinner",(data)=>{
+    console.log("Winner for the game is",data.playerId)
+});
+socket3.on("declareWinner",(data)=>{
+    console.log("Winner for the game is",data.playerId)
+});
+socket4.on("declareWinner",(data)=>{
+    console.log("Winner for the game is",data.playerId)
+});

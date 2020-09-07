@@ -43,6 +43,9 @@ function socketLobbyListeners(socket) {
   socket.on("findAndJoinMatch",(data,cb)=>{
     LobbyMessageHandler.findAndJoinMatch(socket, data, cb);
   });
+  socket.on("playerDiceRoll",(data,cb)=>{
+    LobbyMessageHandler.playerDiceRoll(socket, data, cb);
+  })
 }
 
 var roomno = 1;
