@@ -24,7 +24,7 @@ pm2 start pm2.lobby.json
 
 # Description
 
-# routes folder contains http://localhost:5000/gateway/ API which manages load 
+# routes folder contains http://localhost:5000/gateway/ API which manages load and selects appropriate lobby server for socket connection
 
 # balance func manages load based on user connections
 
